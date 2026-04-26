@@ -21,7 +21,7 @@ En inspectant le formulaire de login, on remarque que les entrées ne sont pas f
 Injection dans le champ `username` :
 
 ```
-' OR 1=1 -- 
+' OR 1=1 --
 ```
 
 La requête SQL devient :

@@ -1,9 +1,9 @@
 ---
-import { getCollection, render } from 'astro:content';
-import BlogPost from '../../layouts/BlogPost.astro';
+import { getCollection, render } from "astro:content";
+import BlogPost from "../../layouts/BlogPost.astro";
 
 export async function getStaticPaths() {
-  const events = await getCollection('evenements', ({ data }) => !data.draft);
+  const events = await getCollection("evenements", ({ data }) => !data.draft);
   return events.map((event) => ({
     params: { id: event.id },
     props: { event },
@@ -11,7 +11,7 @@ export async function getStaticPaths() {
 }
 
 type Props = {
-  event: Awaited<ReturnType<typeof getCollection<'evenements'>>>[number];
+  event: Awaited<ReturnType<typeof getCollection<"evenements">>>[number];
 };
 
 const { event } = Astro.props;
@@ -23,13 +23,18 @@ const isPast = event.data.date < now;
 
 const badges = [
   {
-    label: isPast ? 'Passé' : 'À venir',
+    label: isPast ? "Passé" : "À venir",
     class: isPast
-      ? 'text-zinc-500 bg-zinc-800 border-zinc-700'
-      : 'text-blue-400 bg-blue-500/10 border-blue-500/20',
+      ? "text-zinc-500 bg-zinc-800 border-zinc-700"
+      : "text-blue-400 bg-blue-500/10 border-blue-500/20",
   },
   ...(event.data.lieu
-    ? [{ label: `📍 ${event.data.lieu}`, class: 'text-zinc-400 bg-zinc-800 border-zinc-700' }]
+    ? [
+        {
+          label: `📍 ${event.data.lieu}`,
+          class: "text-zinc-400 bg-zinc-800 border-zinc-700",
+        },
+      ]
     : []),
 ];
 ---

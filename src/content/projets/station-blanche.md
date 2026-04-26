@@ -15,10 +15,10 @@ Ce projet s'inspire des pratiques de l'ANSSI et des exigences des environnements
 
 L'approche repose sur la complémentarité de deux moteurs :
 
-| Moteur | Type | Force |
-|--------|------|--------|
-| **ESET NOD32** | Commercial | Heuristique avancée, détection comportementale, mises à jour cloud |
-| **ClamAV** | Open source | Signatures communautaires, excellent sur scripts, archives, macros |
+| Moteur         | Type        | Force                                                              |
+| -------------- | ----------- | ------------------------------------------------------------------ |
+| **ESET NOD32** | Commercial  | Heuristique avancée, détection comportementale, mises à jour cloud |
+| **ClamAV**     | Open source | Signatures communautaires, excellent sur scripts, archives, macros |
 
 Un fichier doit passer les deux scanners pour être déclaré sain. Cette redondance réduit significativement les faux négatifs.
 

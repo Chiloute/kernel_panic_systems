@@ -1,9 +1,9 @@
 ---
-import { getCollection, render } from 'astro:content';
-import BlogPost from '../../layouts/BlogPost.astro';
+import { getCollection, render } from "astro:content";
+import BlogPost from "../../layouts/BlogPost.astro";
 
 export async function getStaticPaths() {
-  const projets = await getCollection('projets', ({ data }) => !data.draft);
+  const projets = await getCollection("projets", ({ data }) => !data.draft);
   return projets.map((projet) => ({
     params: { id: projet.id },
     props: { projet },
@@ -11,7 +11,7 @@ export async function getStaticPaths() {
 }
 
 type Props = {
-  projet: Awaited<ReturnType<typeof getCollection<'projets'>>>[number];
+  projet: Awaited<ReturnType<typeof getCollection<"projets">>>[number];
 };
 
 const { projet } = Astro.props;

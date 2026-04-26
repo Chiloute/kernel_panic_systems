@@ -12,21 +12,25 @@ Avec une communauté Discord active, la gestion manuelle des rôles, des annonce
 ## Fonctionnalités
 
 ### Gestion des membres
+
 - Attribution automatique des rôles à l'arrivée (membre, invité)
 - Commande `/role` pour auto-attribuer les rôles de pôle (Tech, Cyber, CTF, Communication)
 - Vérification de l'appartenance à l'association
 
 ### Événements
+
 - Annonces automatiques dans `#evenements` à partir du calendrier interne
 - Système de RSVP par réaction (✅ / ❌) avec comptage en temps réel
 - Rappel 24h avant chaque événement via message privé aux inscrits
 
 ### CTF
+
 - Notification dans `#ctf-alerts` lors de l'ouverture de nouvelles compétitions sur CTFtime
 - Création automatique de threads temporaires par CTF avec catégories (Web, Pwn, Crypto…)
 - Archivage des threads après la compétition
 
 ### Utilitaires
+
 - `/whois @membre` — affiche le profil Discord + pôle + ancienneté
 - `/challenge` — challenge de sécurité quotidien tiré aléatoirement depuis notre base
 - `/doc <terme>` — recherche dans la base de connaissances interne (wiki)
@@ -55,19 +59,19 @@ src/
 ```typescript
 // commands/role.ts
 export const data = new SlashCommandBuilder()
-  .setName('role')
-  .setDescription('Attribue un pôle à ton profil')
+  .setName("role")
+  .setDescription("Attribue un pôle à ton profil")
   .addStringOption((opt) =>
     opt
-      .setName('pole')
-      .setDescription('Ton pôle d\'activité')
+      .setName("pole")
+      .setDescription("Ton pôle d'activité")
       .setRequired(true)
       .addChoices(
-        { name: 'Tech',          value: 'tech' },
-        { name: 'Cyber',         value: 'cyber' },
-        { name: 'CTF',           value: 'ctf' },
-        { name: 'Communication', value: 'communication' },
-      )
+        { name: "Tech", value: "tech" },
+        { name: "Cyber", value: "cyber" },
+        { name: "CTF", value: "ctf" },
+        { name: "Communication", value: "communication" },
+      ),
   );
 ```
 

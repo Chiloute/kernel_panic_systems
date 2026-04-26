@@ -1,5 +1,5 @@
 ---
-import Layout from './Layout.astro';
+import Layout from "./Layout.astro";
 
 interface Props {
   title: string;
@@ -19,20 +19,23 @@ const {
   description,
   date,
   tags = [],
-  backHref = '/',
-  backLabel = 'Retour',
-  accentClass = 'text-blue-400',
+  backHref = "/",
+  backLabel = "Retour",
+  accentClass = "text-blue-400",
   badges = [],
 } = Astro.props;
 
 function formatDate(d: Date) {
-  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  return d.toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 ---
 
 <Layout title={title} description={description}>
   <article class="max-w-4xl mx-auto px-4 py-16">
-
     <!-- Retour -->
     <a
       href={backHref}
@@ -40,9 +43,13 @@ function formatDate(d: Date) {
     >
       <svg
         class="w-4 h-4 transition-transform group-hover:-translate-x-0.5"
-        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"
+        ></path>
       </svg>
       {backLabel}
     </a>
@@ -50,43 +57,60 @@ function formatDate(d: Date) {
     <!-- En-tête -->
     <header class="mb-12">
       <!-- Badges (writeup: difficulté, catégorie…) -->
-      {badges.length > 0 && (
-        <div class="flex flex-wrap gap-2 mb-4">
-          {badges.map((b) => (
-            <span class={`text-xs px-2.5 py-1 rounded font-mono border ${b.class}`}>
-              {b.label}
-            </span>
-          ))}
-        </div>
-      )}
+      {
+        badges.length > 0 && (
+          <div class="flex flex-wrap gap-2 mb-4">
+            {badges.map((b) => (
+              <span
+                class={`text-xs px-2.5 py-1 rounded font-mono border ${b.class}`}
+              >
+                {b.label}
+              </span>
+            ))}
+          </div>
+        )
+      }
 
-      <h1 class="text-4xl md:text-5xl font-black tracking-tight text-zinc-100 mb-4 leading-tight">
+      <h1
+        class="text-4xl md:text-5xl font-black tracking-tight text-zinc-100 mb-4 leading-tight"
+      >
         {title}
       </h1>
 
-      {description && (
-        <p class="text-lg text-zinc-400 leading-relaxed mb-6">{description}</p>
-      )}
+      {
+        description && (
+          <p class="text-lg text-zinc-400 leading-relaxed mb-6">
+            {description}
+          </p>
+        )
+      }
 
       <div class="flex flex-wrap items-center gap-3">
-        <time class={`font-mono text-sm ${accentClass}`}>{formatDate(date)}</time>
-        {tags.length > 0 && (
-          <>
-            <span class="text-zinc-700">·</span>
-            <div class="flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <span class="text-xs px-2 py-0.5 bg-zinc-800 text-zinc-400 rounded font-mono border border-zinc-700">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </>
-        )}
+        <time class={`font-mono text-sm ${accentClass}`}
+          >{formatDate(date)}</time
+        >
+        {
+          tags.length > 0 && (
+            <>
+              <span class="text-zinc-700">·</span>
+              <div class="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <span class="text-xs px-2 py-0.5 bg-zinc-800 text-zinc-400 rounded font-mono border border-zinc-700">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </>
+          )
+        }
       </div>
     </header>
 
     <!-- Séparateur gradient -->
-    <div class="h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent mb-12"></div>
+    <div
+      class="h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent mb-12"
+    >
+    </div>
 
     <!-- Contenu Markdown -->
     <div class="prose-kps">
@@ -101,13 +125,18 @@ function formatDate(d: Date) {
       >
         <svg
           class="w-4 h-4 transition-transform group-hover:-translate-x-0.5"
-          fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15 19l-7-7 7-7"></path>
         </svg>
         {backLabel}
       </a>
     </div>
-
   </article>
 </Layout>

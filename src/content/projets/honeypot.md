@@ -7,9 +7,10 @@ tags: [honeypot, sécurité, réseau, threat-intelligence, linux]
 
 ## Qu'est-ce qu'un honeypot ?
 
-Un **pot de miel** (*honeypot*) est un système délibérément exposé, conçu pour attirer les attaquants. Il ne contient aucune donnée réelle et n'a aucune valeur opérationnelle : toute connexion entrante est par définition suspecte.
+Un **pot de miel** (_honeypot_) est un système délibérément exposé, conçu pour attirer les attaquants. Il ne contient aucune donnée réelle et n'a aucune valeur opérationnelle : toute connexion entrante est par définition suspecte.
 
 L'intérêt est double :
+
 - **Passif** : observer ce que font les bots et attaquants dans la nature sans risquer un système de production
 - **Actif** : collecter des indicateurs de compromission (IOC) pour enrichir les règles de détection
 

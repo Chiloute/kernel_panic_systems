@@ -1,27 +1,33 @@
 <script lang="ts">
-  import type { Pole } from '../data/membres';
-  import { poleConfig } from '../data/membres';
+  import type { Pole } from "../data/membres";
+  import { poleConfig } from "../data/membres";
 
   interface Props {
     pseudo: string;
     avatar: string;
     role?: string;
     poles?: Pole[];
-    variant?: 'bureau' | 'member';
+    variant?: "bureau" | "member";
   }
 
-  let { pseudo, avatar, role, poles = [], variant = 'member' }: Props = $props();
+  let {
+    pseudo,
+    avatar,
+    role,
+    poles = [],
+    variant = "member",
+  }: Props = $props();
 
   let imgError = $state(false);
 
-  const isBureau = variant === 'bureau';
+  const isBureau = variant === "bureau";
 </script>
 
 <div
   class="group flex flex-col items-center gap-3 p-5 rounded-xl border transition-all duration-200
     {isBureau
-      ? 'bg-zinc-900 border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900/70'
-      : 'bg-zinc-900/50 border-zinc-800/60 hover:border-zinc-700 hover:bg-zinc-900'}"
+    ? 'bg-zinc-900 border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900/70'
+    : 'bg-zinc-900/50 border-zinc-800/60 hover:border-zinc-700 hover:bg-zinc-900'}"
 >
   <!-- Avatar -->
   <div class="relative shrink-0">
@@ -43,8 +49,8 @@
         alt={pseudo}
         class="rounded-full object-cover border border-zinc-700 transition-all
           {isBureau
-            ? 'w-24 h-24 group-hover:border-zinc-500'
-            : 'w-16 h-16 group-hover:border-zinc-600'}"
+          ? 'w-24 h-24 group-hover:border-zinc-500'
+          : 'w-16 h-16 group-hover:border-zinc-600'}"
         onerror={() => (imgError = true)}
       />
     {/if}
@@ -60,7 +66,11 @@
 
   <!-- Pseudo + rôle -->
   <div class="text-center min-w-0 w-full">
-    <p class="font-mono font-bold text-zinc-100 truncate {isBureau ? 'text-base' : 'text-sm'}">
+    <p
+      class="font-mono font-bold text-zinc-100 truncate {isBureau
+        ? 'text-base'
+        : 'text-sm'}"
+    >
       {pseudo}
     </p>
     {#if role}
@@ -77,7 +87,11 @@
   {#if poles.length > 0}
     <div class="flex flex-wrap justify-center gap-1">
       {#each poles as pole}
-        <span class="text-xs px-2 py-0.5 rounded-full font-mono border {poleConfig[pole].color}">
+        <span
+          class="text-xs px-2 py-0.5 rounded-full font-mono border {poleConfig[
+            pole
+          ].color}"
+        >
           {poleConfig[pole].label}
         </span>
       {/each}

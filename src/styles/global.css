@@ -2,11 +2,11 @@
 
 @theme {
   /* Red Team */
-  --color-red:      #ef4444;
-  --color-red-dim:  #991b1b;
+  --color-red: #ef4444;
+  --color-red-dim: #991b1b;
 
   /* Blue Team */
-  --color-blue:     #3b82f6;
+  --color-blue: #3b82f6;
   --color-blue-dim: #1d4ed8;
 }
 
@@ -66,7 +66,7 @@
     }
 
     & ul li::before {
-      content: '›';
+      content: "›";
       position: absolute;
       left: 0;
       color: #3b82f6;
@@ -84,7 +84,7 @@
     }
 
     & code {
-      font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+      font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
       font-size: 0.85em;
       color: #fca5a5;
       background: #18181b;

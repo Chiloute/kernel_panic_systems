@@ -32,6 +32,7 @@ src/
 ## Design
 
 La charte graphique s'articule autour de la dualité **red team / blue team** :
+
 - Fond noir (`zinc-950`) pour l'ambiance sécurité
 - Rouge pour les éléments offensifs (CTF, writeups, boutons principaux)
 - Bleu pour les éléments défensifs/constructifs (projets, tech)

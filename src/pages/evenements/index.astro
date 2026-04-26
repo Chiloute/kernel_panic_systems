@@ -1,19 +1,21 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import CalendrierEvenements from '../../components/CalendrierEvenements.svelte';
-import { getCollection } from 'astro:content';
+import Layout from "../../layouts/Layout.astro";
+import CalendrierEvenements from "../../components/CalendrierEvenements.svelte";
+import { getCollection } from "astro:content";
 
-const allEvents = await getCollection('evenements', ({ data }) => !data.draft);
-const sorted = allEvents.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const allEvents = await getCollection("evenements", ({ data }) => !data.draft);
+const sorted = allEvents.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
 
 const now = new Date();
 now.setHours(0, 0, 0, 0);
 
-const upcoming = sorted.filter(e => e.data.date >= now);
-const past     = sorted.filter(e => e.data.date < now);
+const upcoming = sorted.filter((e) => e.data.date >= now);
+const past = sorted.filter((e) => e.data.date < now);
 
 // Sérialisation pour le composant Svelte (client)
-const eventsForCalendar = allEvents.map(e => ({
+const eventsForCalendar = allEvents.map((e) => ({
   id: e.id,
   titre: e.data.titre,
   description: e.data.description,
@@ -22,7 +24,11 @@ const eventsForCalendar = allEvents.map(e => ({
 }));
 
 function fmtDate(date: Date) {
-  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  return date.toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
 // Grouper les passés par année
@@ -31,7 +37,9 @@ const pastByYear = past.reduce<Record<number, typeof past>>((acc, e) => {
   (acc[y] ??= []).push(e);
   return acc;
 }, {});
-const pastYears = Object.keys(pastByYear).map(Number).sort((a, b) => b - a);
+const pastYears = Object.keys(pastByYear)
+  .map(Number)
+  .sort((a, b) => b - a);
 ---
 
 <Layout
@@ -39,110 +47,133 @@ const pastYears = Object.keys(pastByYear).map(Number).sort((a, b) => b - a);
   description="Agenda et historique des événements de Kernel Panic Systems."
 >
   <main class="max-w-6xl mx-auto px-4 py-16">
-
     <!-- En-tête -->
     <div class="mb-12">
-      <p class="font-mono text-zinc-500 text-sm mb-4">$ cat agenda/evenements.ics</p>
+      <p class="font-mono text-zinc-500 text-sm mb-4">
+        $ cat agenda/evenements.ics
+      </p>
       <h1 class="text-4xl md:text-5xl font-black tracking-tight mb-4">
         <span class="text-zinc-400">~/</span>événements
       </h1>
       <p class="text-zinc-500 max-w-xl leading-relaxed">
-        Ateliers, compétitions, conférences et réunions — tout ce qui se passe chez KPS.
+        Ateliers, compétitions, conférences et réunions — tout ce qui se passe
+        chez KPS.
       </p>
     </div>
 
     <!-- ── Calendrier interactif ── -->
     <section class="mb-16">
-      <p class="font-mono text-zinc-600 text-xs uppercase tracking-widest mb-6">— Calendrier du mois</p>
+      <p class="font-mono text-zinc-600 text-xs uppercase tracking-widest mb-6">
+        — Calendrier du mois
+      </p>
       <CalendrierEvenements events={eventsForCalendar} client:load />
     </section>
 
     <!-- ── À venir ── -->
-    {upcoming.length > 0 && (
-      <section class="mb-16">
-        <div class="flex items-center gap-3 mb-6">
-          <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-          <p class="font-mono text-zinc-600 text-xs uppercase tracking-widest">À venir</p>
-        </div>
+    {
+      upcoming.length > 0 && (
+        <section class="mb-16">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+            <p class="font-mono text-zinc-600 text-xs uppercase tracking-widest">
+              À venir
+            </p>
+          </div>
 
-        <div class="flex flex-col gap-3">
-          {upcoming.map(event => (
-            <a
-              href={`/evenements/${event.id}`}
-              class="group flex items-center gap-5 p-4 bg-zinc-900 border border-zinc-800 rounded-lg hover:border-blue-500/30 transition-all"
-            >
-              <div class="shrink-0 text-center w-12">
-                <div class="text-xl font-bold font-mono leading-none text-blue-400">
-                  {String(event.data.date.getDate()).padStart(2, '0')}
+          <div class="flex flex-col gap-3">
+            {upcoming.map((event) => (
+              <a
+                href={`/evenements/${event.id}`}
+                class="group flex items-center gap-5 p-4 bg-zinc-900 border border-zinc-800 rounded-lg hover:border-blue-500/30 transition-all"
+              >
+                <div class="shrink-0 text-center w-12">
+                  <div class="text-xl font-bold font-mono leading-none text-blue-400">
+                    {String(event.data.date.getDate()).padStart(2, "0")}
+                  </div>
+                  <div class="text-xs text-zinc-500 font-mono uppercase tracking-widest mt-0.5">
+                    {event.data.date.toLocaleDateString("fr-FR", {
+                      month: "short",
+                    })}
+                  </div>
+                  <div class="text-xs text-zinc-600 font-mono">
+                    {event.data.date.getFullYear()}
+                  </div>
                 </div>
-                <div class="text-xs text-zinc-500 font-mono uppercase tracking-widest mt-0.5">
-                  {event.data.date.toLocaleDateString('fr-FR', { month: 'short' })}
-                </div>
-                <div class="text-xs text-zinc-600 font-mono">
-                  {event.data.date.getFullYear()}
-                </div>
-              </div>
 
-              <div class="flex-1 min-w-0">
-                <h2 class="font-bold text-zinc-100 group-hover:text-blue-400 transition-colors truncate">
-                  {event.data.titre}
-                </h2>
-                <p class="text-sm text-zinc-500 mt-1 line-clamp-1">{event.data.description}</p>
-                {event.data.lieu && (
-                  <p class="text-xs text-zinc-600 font-mono mt-1">{event.data.lieu}</p>
-                )}
-              </div>
+                <div class="flex-1 min-w-0">
+                  <h2 class="font-bold text-zinc-100 group-hover:text-blue-400 transition-colors truncate">
+                    {event.data.titre}
+                  </h2>
+                  <p class="text-sm text-zinc-500 mt-1 line-clamp-1">
+                    {event.data.description}
+                  </p>
+                  {event.data.lieu && (
+                    <p class="text-xs text-zinc-600 font-mono mt-1">
+                      {event.data.lieu}
+                    </p>
+                  )}
+                </div>
 
-              <span class="shrink-0 text-xs px-2.5 py-1 rounded font-mono border text-blue-400 bg-blue-500/10 border-blue-500/20">
-                à venir
-              </span>
-            </a>
-          ))}
-        </div>
-      </section>
-    )}
+                <span class="shrink-0 text-xs px-2.5 py-1 rounded font-mono border text-blue-400 bg-blue-500/10 border-blue-500/20">
+                  à venir
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+      )
+    }
 
     <!-- ── Historique par année ── -->
-    {pastYears.map(year => (
-      <section class="mb-12">
-        <div class="flex items-center gap-4 mb-6">
-          <p class="font-mono text-zinc-600 text-xs uppercase tracking-widest">— {year}</p>
-          <div class="flex-1 h-px bg-zinc-800"></div>
-        </div>
+    {
+      pastYears.map((year) => (
+        <section class="mb-12">
+          <div class="flex items-center gap-4 mb-6">
+            <p class="font-mono text-zinc-600 text-xs uppercase tracking-widest">
+              — {year}
+            </p>
+            <div class="flex-1 h-px bg-zinc-800" />
+          </div>
 
-        <div class="flex flex-col gap-3">
-          {pastByYear[year].map(event => (
-            <a
-              href={`/evenements/${event.id}`}
-              class="group flex items-center gap-5 p-4 bg-zinc-900/60 border border-zinc-800/60 rounded-lg hover:border-zinc-700 transition-all"
-            >
-              <div class="shrink-0 text-center w-12">
-                <div class="text-xl font-bold font-mono leading-none text-zinc-500 group-hover:text-zinc-300 transition-colors">
-                  {String(event.data.date.getDate()).padStart(2, '0')}
+          <div class="flex flex-col gap-3">
+            {pastByYear[year].map((event) => (
+              <a
+                href={`/evenements/${event.id}`}
+                class="group flex items-center gap-5 p-4 bg-zinc-900/60 border border-zinc-800/60 rounded-lg hover:border-zinc-700 transition-all"
+              >
+                <div class="shrink-0 text-center w-12">
+                  <div class="text-xl font-bold font-mono leading-none text-zinc-500 group-hover:text-zinc-300 transition-colors">
+                    {String(event.data.date.getDate()).padStart(2, "0")}
+                  </div>
+                  <div class="text-xs text-zinc-600 font-mono uppercase tracking-widest mt-0.5">
+                    {event.data.date.toLocaleDateString("fr-FR", {
+                      month: "short",
+                    })}
+                  </div>
                 </div>
-                <div class="text-xs text-zinc-600 font-mono uppercase tracking-widest mt-0.5">
-                  {event.data.date.toLocaleDateString('fr-FR', { month: 'short' })}
+
+                <div class="flex-1 min-w-0">
+                  <h2 class="font-bold text-zinc-500 group-hover:text-zinc-200 transition-colors truncate">
+                    {event.data.titre}
+                  </h2>
+                  <p class="text-sm text-zinc-600 mt-1 line-clamp-1">
+                    {event.data.description}
+                  </p>
+                  {event.data.lieu && (
+                    <p class="text-xs text-zinc-700 font-mono mt-1">
+                      {event.data.lieu}
+                    </p>
+                  )}
                 </div>
-              </div>
 
-              <div class="flex-1 min-w-0">
-                <h2 class="font-bold text-zinc-500 group-hover:text-zinc-200 transition-colors truncate">
-                  {event.data.titre}
-                </h2>
-                <p class="text-sm text-zinc-600 mt-1 line-clamp-1">{event.data.description}</p>
-                {event.data.lieu && (
-                  <p class="text-xs text-zinc-700 font-mono mt-1">{event.data.lieu}</p>
-                )}
-              </div>
-
-              <span class="shrink-0 text-xs px-2.5 py-1 rounded font-mono border text-zinc-600 bg-zinc-800/50 border-zinc-700">
-                passé
-              </span>
-            </a>
-          ))}
-        </div>
-      </section>
-    ))}
-
+                <span class="shrink-0 text-xs px-2.5 py-1 rounded font-mono border text-zinc-600 bg-zinc-800/50 border-zinc-700">
+                  passé
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
+      ))
+    }
   </main>
 </Layout>

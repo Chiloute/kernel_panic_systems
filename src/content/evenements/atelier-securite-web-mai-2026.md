@@ -10,18 +10,22 @@ lieu: Salle TP Réseau — IUT
 Cet atelier est destiné à tous les membres souhaitant monter en compétence sur les failles web, que ce soit pour le CTF ou pour la vie pro.
 
 ### Partie 1 — Théorie (45 min)
+
 - Introduction à l'OWASP Top 10
 - Cycle de vie d'une vulnérabilité web
 - Méthodologie de test de pénétration
 
 ### Partie 2 — Pratique (2h)
+
 Travaux pratiques sur [DVWA](https://github.com/digininja/DVWA) (Damn Vulnerable Web Application) hébergé localement :
+
 - SQL Injection (blind & error-based)
 - Cross-Site Scripting (reflected & stored)
 - CSRF — falsification de requêtes
 - Command Injection
 
 ### Partie 3 — Challenge (30 min)
+
 Mini-CTF interne avec 5 challenges web pour tester les acquis.
 
 ## Pré-requis

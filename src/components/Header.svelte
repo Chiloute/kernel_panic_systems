@@ -7,7 +7,7 @@
     { href: "/projets", label: "Projets" },
     { href: "/evenements", label: "Événements" },
     { href: "/writeups", label: "Writeups" },
-    { href: "/bureau", label: "Bureau" },
+    { href: "/equipe", label: "Equipe" },
   ];
 
   function isActive(href) {

@@ -1,0 +1,31 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+
+export async function getStaticPaths() {
+  const projets = await getCollection('projets', ({ data }) => !data.draft);
+  return projets.map((projet) => ({
+    params: { id: projet.id },
+    props: { projet },
+  }));
+}
+
+type Props = {
+  projet: Awaited<ReturnType<typeof getCollection<'projets'>>>[number];
+};
+
+const { projet } = Astro.props;
+const { Content } = await render(projet);
+---
+
+<BlogPost
+  title={projet.data.titre}
+  description={projet.data.description}
+  date={projet.data.date}
+  tags={projet.data.tags}
+  backHref="/projets"
+  backLabel="Projets"
+  accentClass="text-blue-400"
+>
+  <Content />
+</BlogPost>

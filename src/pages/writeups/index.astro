@@ -1,0 +1,84 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import WriteupFilter from '../../components/WriteupFilter.svelte';
+import { getCollection } from 'astro:content';
+
+const allWriteups = await getCollection('writeups', ({ data }) => !data.draft);
+const sorted = allWriteups.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Stats
+const ctfs   = [...new Set(sorted.map(w => w.data.ctf))];
+const cats   = [...new Set(sorted.map(w => w.data.categorie))];
+const totalPts = sorted.reduce((s, w) => s + (w.data.points ?? 0), 0);
+
+// Sérialisation pour Svelte
+const writeupData = sorted.map(w => ({
+  id: w.id,
+  titre: w.data.titre,
+  ctf: w.data.ctf,
+  date: w.data.date.toISOString(),
+  categorie: w.data.categorie,
+  difficulte: w.data.difficulte,
+  tags: w.data.tags,
+  points: w.data.points ?? null,
+}));
+---
+
+<Layout
+  title="Writeups CTF"
+  description="Solutions et analyses des challenges CTF résolus par Kernel Panic Systems."
+>
+  <main class="max-w-6xl mx-auto px-4 py-16">
+
+    <!-- En-tête -->
+    <div class="mb-12">
+      <p class="font-mono text-zinc-500 text-sm mb-4">$ cat writeups/README.md</p>
+      <h1 class="text-4xl md:text-5xl font-black tracking-tight mb-4">
+        <span class="text-red-400">~/</span>writeups
+      </h1>
+      <p class="text-zinc-500 max-w-xl leading-relaxed">
+        Nos solutions détaillées pour les challenges CTF — web, crypto, forensics, reverse et pwn.
+        Tout est documenté pour que chacun puisse apprendre.
+      </p>
+    </div>
+
+    <!-- Stats CTF -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
+      {[
+        { label: 'Writeups',    value: sorted.length },
+        { label: 'CTFs joués',  value: ctfs.length },
+        { label: 'Catégories',  value: cats.length },
+        { label: 'Points cumulés', value: totalPts },
+      ].map(stat => (
+        <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 text-center">
+          <p class="text-2xl font-black font-mono text-zinc-100 mb-1">{stat.value}</p>
+          <p class="text-xs font-mono text-zinc-500">{stat.label}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- Intro CTF -->
+    <div class="p-[1px] rounded-xl bg-gradient-to-r from-red-800/60 via-purple-800/40 to-blue-800/60 mb-12">
+      <div class="rounded-xl bg-zinc-950 p-6 md:p-8">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="font-mono text-xs text-red-400 tracking-widest uppercase px-2 py-0.5 border border-red-500/30 rounded bg-red-500/5">Offensive</span>
+          <div class="h-px flex-1 max-w-xs bg-gradient-to-r from-red-500/20 to-blue-500/20"></div>
+          <span class="font-mono text-xs text-blue-400 tracking-widest uppercase px-2 py-0.5 border border-blue-500/30 rounded bg-blue-500/5">Defensive</span>
+        </div>
+        <h2 class="text-xl font-bold mb-2">
+          Capture <span class="bg-gradient-to-r from-red-400 to-blue-400 bg-clip-text text-transparent">The Flag</span>
+        </h2>
+        <p class="text-sm text-zinc-400 max-w-2xl leading-relaxed">
+          On participe régulièrement à des compétitions CTF en équipe — web, reverse,
+          crypto, pwn, forensics. Chaque challenge résolu donne lieu à un writeup
+          détaillé publié ici. L'objectif : comprendre comment ça casse pour mieux
+          le sécuriser, et partager les connaissances avec toute l'association.
+        </p>
+      </div>
+    </div>
+
+    <!-- Filtres + grille -->
+    <WriteupFilter writeups={writeupData} client:load />
+
+  </main>
+</Layout>

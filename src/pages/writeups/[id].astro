@@ -1,0 +1,47 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+
+export async function getStaticPaths() {
+  const writeups = await getCollection('writeups', ({ data }) => !data.draft);
+  return writeups.map((writeup) => ({
+    params: { id: writeup.id },
+    props: { writeup },
+  }));
+}
+
+type Props = {
+  writeup: Awaited<ReturnType<typeof getCollection<'writeups'>>>[number];
+};
+
+const { writeup } = Astro.props;
+const { Content }  = await render(writeup);
+
+const diffColors: Record<string, string> = {
+  easy:   'text-green-400  bg-green-400/10  border-green-400/20',
+  medium: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20',
+  hard:   'text-orange-400 bg-orange-400/10 border-orange-400/20',
+  insane: 'text-red-400    bg-red-400/10    border-red-400/20',
+};
+
+const badges = [
+  { label: writeup.data.difficulte,  class: diffColors[writeup.data.difficulte] },
+  { label: writeup.data.categorie,   class: 'text-zinc-400 bg-zinc-800 border-zinc-700' },
+  { label: writeup.data.ctf,         class: 'text-red-400  bg-red-500/10 border-red-500/20' },
+  ...(writeup.data.points
+    ? [{ label: `${writeup.data.points} pts`, class: 'text-zinc-500 bg-zinc-800 border-zinc-700' }]
+    : []),
+];
+---
+
+<BlogPost
+  title={writeup.data.titre}
+  date={writeup.data.date}
+  tags={writeup.data.tags}
+  backHref="/writeups"
+  backLabel="Writeups"
+  accentClass="text-red-400"
+  badges={badges}
+>
+  <Content />
+</BlogPost>

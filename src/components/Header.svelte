@@ -5,8 +5,10 @@
   const navLinks = [
     { href: "/", label: "Accueil" },
     { href: "/projets", label: "Projets" },
-    { href: "/evenements", label: "Événements" },
+    { href: "/formations", label: "Formations" },
     { href: "/writeups", label: "Writeups" },
+    { href: "/articles", label: "Articles" },
+    { href: "/evenements", label: "Événements" },
     { href: "/equipe", label: "Equipe" },
   ];
 

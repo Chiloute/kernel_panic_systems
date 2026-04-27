@@ -1,0 +1,64 @@
+---
+import { getCollection, render } from "astro:content";
+import BlogPost from "../../layouts/BlogPost.astro";
+
+export async function getStaticPaths() {
+  const formations = await getCollection("formations", ({ data }) => !data.draft);
+  return formations.map((formation) => ({
+    params: { id: formation.id },
+    props: { formation },
+  }));
+}
+
+type Props = {
+  formation: Awaited<ReturnType<typeof getCollection<"formations">>>[number];
+};
+
+const { formation } = Astro.props;
+const { Content } = await render(formation);
+
+const now = new Date();
+now.setHours(0, 0, 0, 0);
+const isPast = formation.data.date < now;
+
+const niveauLabels: Record<string, string> = {
+  debutant: "Débutant",
+  intermediaire: "Intermédiaire",
+  avance: "Avancé",
+};
+const niveauClasses: Record<string, string> = {
+  debutant:      "text-green-400 bg-green-500/10 border-green-500/20",
+  intermediaire: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
+  avance:        "text-red-400 bg-red-500/10 border-red-500/20",
+};
+
+const badges = [
+  {
+    label: niveauLabels[formation.data.niveau],
+    class: niveauClasses[formation.data.niveau],
+  },
+  {
+    label: isPast ? "Passée" : "À venir",
+    class: isPast
+      ? "text-zinc-500 bg-zinc-800 border-zinc-700"
+      : "text-green-400 bg-green-500/10 border-green-500/20",
+  },
+  ...formation.data.outils.map((outil) => ({
+    label: outil,
+    class: "text-zinc-400 bg-zinc-800 border-zinc-700",
+  })),
+];
+---
+
+<BlogPost
+  title={formation.data.titre}
+  description={formation.data.description}
+  date={formation.data.date}
+  tags={formation.data.tags}
+  backHref="/formations"
+  backLabel="Formations"
+  accentClass="text-green-400"
+  badges={badges}
+>
+  <Content />
+</BlogPost>

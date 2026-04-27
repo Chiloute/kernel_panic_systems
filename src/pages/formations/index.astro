@@ -1,0 +1,169 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const allFormations = await getCollection("formations", ({ data }) => !data.draft);
+const sorted = allFormations.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const now = new Date();
+now.setHours(0, 0, 0, 0);
+
+const upcoming = sorted.filter((f) => f.data.date >= now);
+const past = sorted.filter((f) => f.data.date < now);
+
+const pastByYear = past.reduce<Record<number, typeof past>>((acc, f) => {
+  const y = f.data.date.getFullYear();
+  (acc[y] ??= []).push(f);
+  return acc;
+}, {});
+const pastYears = Object.keys(pastByYear)
+  .map(Number)
+  .sort((a, b) => b - a);
+
+const niveauConfig: Record<string, { label: string; class: string }> = {
+  debutant:      { label: "Débutant",      class: "text-green-400 bg-green-500/10 border-green-500/20" },
+  intermediaire: { label: "Intermédiaire", class: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20" },
+  avance:        { label: "Avancé",        class: "text-red-400 bg-red-500/10 border-red-500/20" },
+};
+---
+
+<Layout
+  title="Formations"
+  description="Supports de cours, ateliers et exercices pratiques de Kernel Panic Systems."
+>
+  <main class="max-w-6xl mx-auto px-4 py-16">
+    <div class="mb-12">
+      <p class="font-mono text-zinc-500 text-sm mb-4">
+        $ ls -la formations/
+      </p>
+      <h1 class="text-4xl md:text-5xl font-black tracking-tight mb-4">
+        <span class="text-green-400">~/</span>formations
+      </h1>
+      <p class="text-zinc-500 max-w-xl leading-relaxed">
+        Nos ateliers internes — supports de cours, exercices pratiques et
+        ressources pour monter en compétences.
+      </p>
+    </div>
+
+    {
+      upcoming.length > 0 && (
+        <section class="mb-16">
+          <div class="flex items-center gap-3 mb-6">
+            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            <p class="font-mono text-zinc-600 text-xs uppercase tracking-widest">
+              À venir
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-3">
+            {upcoming.map((f) => {
+              const niveau = niveauConfig[f.data.niveau];
+              return (
+                <a
+                  href={`/formations/${f.id}`}
+                  class="group flex items-center gap-5 p-4 bg-zinc-900 border border-zinc-800 rounded-lg hover:border-green-500/30 transition-all"
+                >
+                  <div class="shrink-0 text-center w-12">
+                    <div class="text-xl font-bold font-mono leading-none text-green-400">
+                      {String(f.data.date.getDate()).padStart(2, "0")}
+                    </div>
+                    <div class="text-xs text-zinc-500 font-mono uppercase tracking-widest mt-0.5">
+                      {f.data.date.toLocaleDateString("fr-FR", { month: "short" })}
+                    </div>
+                    <div class="text-xs text-zinc-600 font-mono">
+                      {f.data.date.getFullYear()}
+                    </div>
+                  </div>
+
+                  <div class="flex-1 min-w-0">
+                    <h2 class="font-bold text-zinc-100 group-hover:text-green-400 transition-colors truncate">
+                      {f.data.titre}
+                    </h2>
+                    <p class="text-sm text-zinc-500 mt-1 line-clamp-1">
+                      {f.data.description}
+                    </p>
+                    {f.data.outils.length > 0 && (
+                      <p class="text-xs text-zinc-600 font-mono mt-1">
+                        {f.data.outils.join(", ")}
+                      </p>
+                    )}
+                  </div>
+
+                  <span
+                    class={`shrink-0 text-xs px-2.5 py-1 rounded font-mono border ${niveau.class}`}
+                  >
+                    {niveau.label}
+                  </span>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      pastYears.map((year) => (
+        <section class="mb-12">
+          <div class="flex items-center gap-4 mb-6">
+            <p class="font-mono text-zinc-600 text-xs uppercase tracking-widest">
+              — {year}
+            </p>
+            <div class="flex-1 h-px bg-zinc-800" />
+          </div>
+
+          <div class="flex flex-col gap-3">
+            {pastByYear[year].map((f) => {
+              const niveau = niveauConfig[f.data.niveau];
+              return (
+                <a
+                  href={`/formations/${f.id}`}
+                  class="group flex items-center gap-5 p-4 bg-zinc-900/60 border border-zinc-800/60 rounded-lg hover:border-zinc-700 transition-all"
+                >
+                  <div class="shrink-0 text-center w-12">
+                    <div class="text-xl font-bold font-mono leading-none text-zinc-500 group-hover:text-zinc-300 transition-colors">
+                      {String(f.data.date.getDate()).padStart(2, "0")}
+                    </div>
+                    <div class="text-xs text-zinc-600 font-mono uppercase tracking-widest mt-0.5">
+                      {f.data.date.toLocaleDateString("fr-FR", { month: "short" })}
+                    </div>
+                  </div>
+
+                  <div class="flex-1 min-w-0">
+                    <h2 class="font-bold text-zinc-500 group-hover:text-zinc-200 transition-colors truncate">
+                      {f.data.titre}
+                    </h2>
+                    <p class="text-sm text-zinc-600 mt-1 line-clamp-1">
+                      {f.data.description}
+                    </p>
+                    {f.data.outils.length > 0 && (
+                      <p class="text-xs text-zinc-700 font-mono mt-1">
+                        {f.data.outils.join(", ")}
+                      </p>
+                    )}
+                  </div>
+
+                  <span
+                    class={`shrink-0 text-xs px-2.5 py-1 rounded font-mono border ${niveau.class} opacity-60`}
+                  >
+                    {niveau.label}
+                  </span>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      ))
+    }
+
+    {
+      sorted.length === 0 && (
+        <div class="text-center py-24">
+          <p class="font-mono text-zinc-600 text-sm">Aucune formation pour l'instant.</p>
+        </div>
+      )
+    }
+  </main>
+</Layout>

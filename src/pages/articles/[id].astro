@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from "astro:content";
+import BlogPost from "../../layouts/BlogPost.astro";
+
+export async function getStaticPaths() {
+  const articles = await getCollection("articles", ({ data }) => !data.draft);
+  return articles.map((article) => ({
+    params: { id: article.id },
+    props: { article },
+  }));
+}
+
+type Props = {
+  article: Awaited<ReturnType<typeof getCollection<"articles">>>[number];
+};
+
+const { article } = Astro.props;
+const { Content } = await render(article);
+
+const categorieLabels: Record<string, string> = {
+  avis:     "Avis",
+  tutoriel: "Tutoriel",
+  retour:   "Retour d'expérience",
+};
+const categorieClasses: Record<string, string> = {
+  avis:     "text-purple-400 bg-purple-500/10 border-purple-500/20",
+  tutoriel: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+  retour:   "text-amber-400 bg-amber-500/10 border-amber-500/20",
+};
+
+const badges = [
+  {
+    label: categorieLabels[article.data.categorie],
+    class: categorieClasses[article.data.categorie],
+  },
+];
+---
+
+<BlogPost
+  title={article.data.titre}
+  description={article.data.description}
+  date={article.data.date}
+  tags={article.data.tags}
+  backHref="/articles"
+  backLabel="Articles"
+  accentClass="text-purple-400"
+  badges={badges}
+>
+  <Content />
+</BlogPost>

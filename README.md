@@ -1,6 +1,6 @@
 # Kernel Panic Systems — Site officiel
 
-Site web de l'association d'informatique et de cybersécurité **Kernel Panic Systems** (ESIEA Paris, Ivry-sur-Seine). Construit avec Astro 6, Svelte 5 et TailwindCSS v4, packagé de façon reproductible via Nix/bun2nix.
+Site web de l'association d'informatique et de cybersécurité **Kernel Panic Systems** (ESIEA Paris, Ivry-sur-Seine). Construit avec Astro 6, Svelte 5 et TailwindCSS v4.
 
 ---
 
@@ -11,8 +11,7 @@ Site web de l'association d'informatique et de cybersécurité **Kernel Panic Sy
 | [Astro 6](https://astro.build) | Framework SSG — routing fichier, Content Collections, build statique |
 | [Svelte 5](https://svelte.dev) | Composants interactifs (filtres, calendrier, navigation mobile) |
 | [TailwindCSS v4](https://tailwindcss.com) | CSS utilitaire — configuration CSS-first via `@theme` |
-| [Bun](https://bun.sh) | Gestionnaire de paquets et runtime |
-| [Nix / bun2nix](https://github.com/nix-community/bun2nix) | Build reproductible via flake |
+| [Bun](https://bun.sh) | Gestionnaire de paquets et runtime (alternatif à npm) |
 
 ---
 
@@ -37,8 +36,15 @@ kernel_panic_systems/
 │   │   ├── writeups/
 │   │   │   ├── index.astro       # Writeups CTF avec filtres
 │   │   │   └── [id].astro        # Page writeup individuelle
-│   │   └── bureau/
-│   │       └── index.astro       # Organigramme + membres
+│   │   ├── formations/
+│   │   │   ├── index.astro       # Liste des formations
+│   │   │   └── [id].astro        # Page formation individuelle
+│   │   ├── techno/
+│   │   │   ├── index.astro       # Articles tech et tutoriels
+│   │   │   └── [id].astro        # Page article individuelle
+│   │   ├── equipe/
+│   │   │   └── index.astro       # Organigramme + membres
+│   │   └── rejoindre.astro       # Page "Rejoindre KPS"
 │   │
 │   ├── layouts/
 │   │   ├── Layout.astro          # Shell HTML global (Header + Footer)
@@ -52,10 +58,12 @@ kernel_panic_systems/
 │   │   ├── CalendrierEvenements.svelte  # Calendrier interactif
 │   │   └── WriteupFilter.svelte  # Filtres CTF/catégorie/difficulté
 │   │
-│   ├── content/                  # Collections Markdown
+│   ├── content/                  # Collections Markdown (contenu éditorial)
 │   │   ├── projets/              # Articles projets (.md)
 │   │   ├── evenements/           # Articles événements (.md)
-│   │   └── writeups/             # Writeups CTF (.md)
+│   │   ├── writeups/             # Writeups CTF (.md)
+│   │   ├── formations/           # Guides et ateliers (.md)
+│   │   └── techno/               # Articles tech et retours d'expérience (.md)
 │   │
 │   ├── data/
 │   │   └── membres.ts            # Bureau et membres (pseudos + avatars)
@@ -63,9 +71,8 @@ kernel_panic_systems/
 │   ├── styles/
 │   │   └── global.css            # Thème Tailwind + typo .prose-kps
 │   │
-│   └── content.config.ts         # Schémas Content Collections
+│   └── content.config.ts         # Schémas Content Collections (Zod)
 │
-├── flake.nix                     # Package Nix reproductible
 ├── astro.config.mjs              # Config Astro (Svelte + Tailwind)
 └── package.json
 ```
@@ -76,18 +83,19 @@ kernel_panic_systems/
 
 ### Prérequis
 
-- **Bun** ≥ 1.x — [installation](https://bun.sh/docs/installation)
-- ou **Nix** avec flakes activés (environnement complet via `nix develop`)
+- **Node.js** ≥ 22.12.0 — [nodejs.org](https://nodejs.org)
+- **npm** ≥ 10 (inclus avec Node.js)
+- ou **Bun** ≥ 1.x — [bun.sh](https://bun.sh/docs/installation) (alternatif, plus rapide)
 
 ### Démarrage rapide
 
 ```bash
-# Avec Bun directement
-bun install
-bun dev        # Serveur de dev sur http://localhost:4321
+# Avec npm
+npm install
+npm run dev        # Serveur de dev sur http://localhost:4321
 
-# Avec Nix (fournit bun automatiquement)
-nix develop
+# Avec Bun (alternatif)
+bun install
 bun dev
 ```
 
@@ -95,18 +103,16 @@ bun dev
 
 | Commande | Action |
 |---|---|
-| `bun dev` | Serveur de développement sur `localhost:4321` (hot-reload) |
-| `bun run build` | Build de production dans `./dist/` |
-| `bun preview` | Prévisualisation du build de production |
-| `nix build` | Build reproductible via Nix (nécessite `bun.nix` à jour) |
-
-> **Note Nix** : si `bun.nix` est absent ou que `bun.lock` a changé, régénérer avec `nix develop -c bun2nix` avant de commiter.
+| `npm run dev` | Serveur de développement sur `localhost:4321` (hot-reload) |
+| `npm run build` | Build de production dans `./dist/` |
+| `npm run preview` | Prévisualisation du build de production |
+| `npm run astro check` | Type-checking des fichiers `.astro` |
 
 ---
 
 ## Gestion du contenu
 
-Tout le contenu éditorial est dans `src/content/` sous forme de fichiers Markdown avec un frontmatter YAML.
+Tout le contenu éditorial est dans `src/content/` sous forme de fichiers Markdown avec un frontmatter YAML. Les schémas sont définis dans `src/content.config.ts` via Zod.
 
 ### Ajouter un projet
 
@@ -164,12 +170,46 @@ draft: false
 ...
 ```
 
+### Ajouter une formation
+
+Créer `src/content/formations/nom-formation.md` :
+
+```markdown
+---
+titre: Introduction à la CLI Linux
+description: Prise en main du terminal pour débutants
+date: 2026-05-01
+niveau: debutant          # debutant | intermediaire | avance
+tags: [linux, shell, bash]
+outils: [bash, vim]
+draft: false
+---
+
+Contenu de la formation...
+```
+
+### Ajouter un article techno
+
+Créer `src/content/techno/nom-article.md` :
+
+```markdown
+---
+titre: Titre de l'article
+description: Résumé en une phrase
+date: 2026-04-10
+categorie: retour         # tutoriel | retour
+tags: [astro, svelte]
+draft: false
+---
+
+Corps de l'article...
+```
+
 ### Mettre à jour les membres
 
 Éditer `src/data/membres.ts` :
 
 ```typescript
-// Bureau — remplacer les pseudos et avatars Discord
 export const bureau: BureauMember[] = [
   {
     pseudo: 'MonPseudoDiscord',
@@ -181,7 +221,6 @@ export const bureau: BureauMember[] = [
   // ...
 ];
 
-// Membres simples
 export const membres: Member[] = [
   { pseudo: 'Pseudo', avatar: '/avatars/default.svg', poles: ['cyber'] },
   // ...
@@ -208,17 +247,19 @@ const socials = [
 
 Le site Astro génère des **fichiers statiques** dans `./dist/` : HTML, CSS, JS, images. N'importe quel serveur HTTP peut les servir.
 
-### 1. Build standard (Bun)
+### 1. Build
 
 ```bash
-bun run build
+npm run build
 # Les fichiers sont dans ./dist/
 ```
 
 ### 2. Nginx
 
+Copier `dist/` sur le serveur puis configurer Nginx :
+
 ```bash
-bun run build
+npm run build
 rsync -av dist/ utilisateur@serveur:/var/www/kps/
 ```
 
@@ -237,7 +278,7 @@ server {
         try_files $uri $uri/ $uri.html =404;
     }
 
-    # Cache agressif pour les assets avec hash
+    # Cache agressif pour les assets avec hash de contenu
     location /_astro/ {
         expires 1y;
         add_header Cache-Control "public, immutable";
@@ -253,7 +294,7 @@ Pour HTTPS, ajouter Certbot : `certbot --nginx -d kps.example.com`
 ### 3. Caddy (recommandé — HTTPS automatique)
 
 ```bash
-bun run build
+npm run build
 rsync -av dist/ utilisateur@serveur:/var/www/kps/
 ```
 
@@ -268,31 +309,9 @@ kps.example.com {
 }
 ```
 
-Caddy gère le certificat Let's Encrypt automatiquement.
+Caddy gère le certificat Let's Encrypt automatiquement, sans configuration supplémentaire.
 
-### 4. Build Nix (reproductible)
-
-Pour un déploiement sur NixOS ou via `nix copy` :
-
-```bash
-# Générer bun.nix si absent ou après mise à jour des dépendances
-nix develop -c bun2nix
-
-# Build
-nix build
-# Résultat dans ./result/share/blog/
-```
-
-Le résultat peut être servi directement ou intégré dans une configuration NixOS :
-
-```nix
-# configuration.nix
-services.nginx.virtualHosts."kps.example.com" = {
-  root = "${pkgs.callPackage ./kernel_panic_systems {}}/share/blog";
-};
-```
-
-### 5. GitHub Pages / Netlify / Vercel
+### 4. GitHub Pages / Netlify / Vercel
 
 Le site étant 100% statique, il est compatible avec toutes ces plateformes.
 
@@ -309,16 +328,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install
-      - run: bun run build
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - run: npm run build
       - uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
 ```
 
-**Netlify** : connecter le dépôt, build command `bun run build`, publish directory `dist`.
+**Netlify** : connecter le dépôt, build command `npm run build`, publish directory `dist`.
 
 **Vercel** : même config, framework preset `Astro`.
 

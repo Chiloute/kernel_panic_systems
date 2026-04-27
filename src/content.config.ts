@@ -39,4 +39,29 @@ const writeups = defineCollection({
   }),
 });
 
-export const collections = { projets, evenements, writeups };
+const formations = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/formations' }),
+  schema: z.object({
+    titre: z.string(),
+    description: z.string(),
+    date: z.coerce.date(),
+    niveau: z.enum(['debutant', 'intermediaire', 'avance']).default('debutant'),
+    tags: z.array(z.string()).default([]),
+    outils: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+const articles = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/articles' }),
+  schema: z.object({
+    titre: z.string(),
+    description: z.string(),
+    date: z.coerce.date(),
+    categorie: z.enum(['avis', 'tutoriel', 'retour']),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { projets, evenements, writeups, formations, articles };

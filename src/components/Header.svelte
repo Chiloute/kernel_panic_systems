@@ -7,7 +7,7 @@
     { href: "/projets", label: "Projets" },
     { href: "/formations", label: "Formations" },
     { href: "/writeups", label: "Writeups" },
-    { href: "/articles", label: "Articles" },
+    { href: "/techno", label: "Technos" },
     { href: "/evenements", label: "Événements" },
     { href: "/equipe", label: "Equipe" },
   ];

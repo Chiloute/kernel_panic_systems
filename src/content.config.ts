@@ -1,8 +1,8 @@
-import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { defineCollection, z } from "astro:content";
+import { glob } from "astro/loaders";
 
 const projets = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/projets' }),
+  loader: glob({ pattern: "**/*.md", base: "./src/content/projets" }),
   schema: z.object({
     titre: z.string(),
     description: z.string(),
@@ -14,7 +14,7 @@ const projets = defineCollection({
 });
 
 const evenements = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/evenements' }),
+  loader: glob({ pattern: "**/*.md", base: "./src/content/evenements" }),
   schema: z.object({
     titre: z.string(),
     description: z.string(),
@@ -26,13 +26,13 @@ const evenements = defineCollection({
 });
 
 const writeups = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/writeups' }),
+  loader: glob({ pattern: "**/*.md", base: "./src/content/writeups" }),
   schema: z.object({
     titre: z.string(),
     ctf: z.string(),
     date: z.coerce.date(),
     categorie: z.string(),
-    difficulte: z.enum(['easy', 'medium', 'hard', 'insane']),
+    difficulte: z.enum(["easy", "medium", "hard", "insane"]),
     tags: z.array(z.string()).default([]),
     points: z.number().optional(),
     draft: z.boolean().default(false),
@@ -40,12 +40,12 @@ const writeups = defineCollection({
 });
 
 const formations = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/formations' }),
+  loader: glob({ pattern: "**/*.md", base: "./src/content/formations" }),
   schema: z.object({
     titre: z.string(),
     description: z.string(),
     date: z.coerce.date(),
-    niveau: z.enum(['debutant', 'intermediaire', 'avance']).default('debutant'),
+    niveau: z.enum(["debutant", "intermediaire", "avance"]).default("debutant"),
     tags: z.array(z.string()).default([]),
     outils: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
@@ -53,15 +53,21 @@ const formations = defineCollection({
 });
 
 const articles = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/articles' }),
+  loader: glob({ pattern: "**/*.md", base: "./src/content/techno" }),
   schema: z.object({
     titre: z.string(),
     description: z.string(),
     date: z.coerce.date(),
-    categorie: z.enum(['avis', 'tutoriel', 'retour']),
+    categorie: z.enum(["tutoriel", "retour"]),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
   }),
 });
 
-export const collections = { projets, evenements, writeups, formations, articles };
+export const collections = {
+  projets,
+  evenements,
+  writeups,
+  formations,
+  articles,
+};

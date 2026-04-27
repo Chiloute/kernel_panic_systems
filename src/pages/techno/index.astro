@@ -1,152 +1,93 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import MemberCard from "../../components/MemberCard.svelte";
-import MembresGrid from "../../components/MembresGrid.svelte";
-import { bureau, membres, poleConfig } from "../../data/membres";
-import type { Pole } from "../../data/membres";
+import { getCollection } from "astro:content";
 
-const tousLesMembres = [
-  ...bureau
-    .filter((b) => b.poles?.length)
-    .map((b) => ({
-      pseudo: b.pseudo,
-      avatar: b.avatar,
-      poles: b.poles as Pole[],
-    })),
-  ...membres,
-];
+const allArticles = await getCollection("articles", ({ data }) => !data.draft);
+const sorted = allArticles.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
 
-const [president, vp, ...bottom] = bureau;
+const categorieConfig: Record<string, { label: string; class: string }> = {
+  avis:     { label: "Avis",     class: "text-purple-400 bg-purple-500/10 border-purple-500/20" },
+  tutoriel: { label: "Tutoriel", class: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
+  retour:   { label: "Retour d'expérience", class: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
+};
+
+function fmtDate(date: Date) {
+  return date.toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
 ---
 
 <Layout
-  title="Bureau"
-  description="Organigramme et membres de Kernel Panic Systems"
+  title="Articles"
+  description="Avis sur des technos, tutoriels et retours d'expérience de Kernel Panic Systems."
 >
   <main class="max-w-6xl mx-auto px-4 py-16">
-    <!-- En-tête -->
-    <div class="mb-16">
+    <div class="mb-12">
       <p class="font-mono text-zinc-500 text-sm mb-4">
-        $ cat equipe/organigramme.txt
+        $ cat articles/index.md
       </p>
       <h1 class="text-4xl md:text-5xl font-black tracking-tight mb-4">
-        <span
-          class="bg-gradient-to-r from-red-400 to-blue-400 bg-clip-text text-transparent"
-          >~/</span
-        >team
+        <span class="text-purple-400">~/</span>articles
       </h1>
       <p class="text-zinc-500 max-w-xl leading-relaxed">
-        Le bureau de l'association et ses membres, organisés par pôles
-        d'activité.
+        Nos avis sur des technos, tutoriels techniques et retours d'expérience
+        — ce qu'on a appris, ce qu'on recommande, ce qu'on éviterait.
       </p>
     </div>
 
-    <!-- ══ Organigramme ══ -->
-    <section class="mb-20">
-      <p
-        class="font-mono text-zinc-600 text-xs uppercase tracking-widest mb-10"
-      >
-        — Bureau général
-      </p>
-
-      <!-- Niveau 1 : Président -->
-      <div class="flex justify-center mb-0">
-        <div class="w-full max-w-xs">
-          <MemberCard
-            pseudo={president.pseudo}
-            avatar={president.avatar}
-            role={president.role}
-            poles={president.poles}
-            variant="bureau"
-            client:load
-          />
+    {
+      sorted.length > 0 ? (
+        <div class="flex flex-col gap-4">
+          {sorted.map((article) => {
+            const cat = categorieConfig[article.data.categorie];
+            return (
+              <a
+                href={`/articles/${article.id}`}
+                class="group p-5 bg-zinc-900 border border-zinc-800 rounded-lg hover:border-purple-500/30 transition-all"
+              >
+                <div class="flex items-start gap-4">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                      <span
+                        class={`text-xs px-2.5 py-0.5 rounded font-mono border ${cat.class}`}
+                      >
+                        {cat.label}
+                      </span>
+                      <time class="text-xs font-mono text-zinc-600">
+                        {fmtDate(article.data.date)}
+                      </time>
+                    </div>
+                    <h2 class="font-bold text-zinc-100 group-hover:text-purple-400 transition-colors mb-1">
+                      {article.data.titre}
+                    </h2>
+                    <p class="text-sm text-zinc-500 line-clamp-2">
+                      {article.data.description}
+                    </p>
+                    {article.data.tags.length > 0 && (
+                      <div class="flex flex-wrap gap-1.5 mt-3">
+                        {article.data.tags.map((tag) => (
+                          <span class="text-xs px-2 py-0.5 bg-zinc-800 text-zinc-500 rounded font-mono border border-zinc-700">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </a>
+            );
+          })}
         </div>
-      </div>
-
-      <!-- Connecteur -->
-      <div class="flex justify-center">
-        <div class="w-px h-8 bg-gradient-to-b from-red-500/40 to-purple-500/40">
+      ) : (
+        <div class="text-center py-24">
+          <p class="font-mono text-zinc-600 text-sm">Aucun article pour l'instant.</p>
         </div>
-      </div>
-
-      <!-- Niveau 2 : Vice-Président -->
-      <div class="flex justify-center mb-0">
-        <div class="w-full max-w-xs">
-          <MemberCard
-            pseudo={vp.pseudo}
-            avatar={vp.avatar}
-            role={vp.role}
-            poles={vp.poles}
-            variant="bureau"
-            client:load
-          />
-        </div>
-      </div>
-
-      <!-- Connecteur avec branches vers 3 -->
-      <div class="flex justify-center">
-        <div class="relative w-full max-w-2xl h-8">
-          <div
-            class="absolute left-1/2 -translate-x-1/2 top-0 w-px h-4 bg-purple-500/40"
-          >
-          </div>
-          <div
-            class="absolute left-[16.67%] right-[16.67%] top-4 h-px bg-gradient-to-r from-red-500/30 via-purple-500/30 to-blue-500/30"
-          >
-          </div>
-          <div class="absolute left-[16.67%] top-4 w-px h-4 bg-red-500/30">
-          </div>
-          <div
-            class="absolute left-1/2 -translate-x-1/2 top-4 w-px h-4 bg-purple-500/30"
-          >
-          </div>
-          <div class="absolute right-[16.67%] top-4 w-px h-4 bg-blue-500/30">
-          </div>
-        </div>
-      </div>
-
-      <!-- Niveau 3 -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
-        {
-          bottom.map((member) => (
-            <MemberCard
-              pseudo={member.pseudo}
-              avatar={member.avatar}
-              role={member.role}
-              poles={member.poles}
-              variant="bureau"
-              client:load
-            />
-          ))
-        }
-      </div>
-    </section>
-
-    <!-- Séparateur gradient -->
-    <div
-      class="h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent mb-20"
-    >
-    </div>
-
-    <!-- ══ Membres par pôle ══ -->
-    <section>
-      <p class="font-mono text-zinc-600 text-xs uppercase tracking-widest mb-4">
-        — Membres &amp; pôles
-      </p>
-
-      <!-- Légende -->
-      <div class="flex flex-wrap gap-4 mb-10">
-        {
-          Object.entries(poleConfig).map(([, cfg]) => (
-            <div class="flex items-center gap-2">
-              <span class={`w-2 h-2 rounded-full ${cfg.dot}`} />
-              <span class="text-xs font-mono text-zinc-400">{cfg.label}</span>
-            </div>
-          ))
-        }
-      </div>
-
-      <MembresGrid membres={tousLesMembres} client:load />
-    </section>
+      )
+    }
   </main>
 </Layout>

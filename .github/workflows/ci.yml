@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  security:
+    name: Security — Semgrep + npm audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # pour uploader les résultats SARIF
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Audit des dépendances — bloque sur les vulnérabilités critiques et hautes
+      - name: npm audit
+        run: npm audit --audit-level=high
+
+      # Semgrep — analyse statique du code source
+      - name: Semgrep scan
+        uses: semgrep/semgrep-action@v1
+        with:
+          config: >-
+            p/javascript
+            p/typescript
+            p/owasp-top-ten
+            p/secrets
+            p/xss
+          # Résultats exportés en SARIF pour l'onglet Security de GitHub
+          generateSarif: "1"
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}   # optionnel, pour Semgrep Cloud
+
+      - name: Upload SARIF results
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+        continue-on-error: true   # pas bloquant si SARIF vide
+
+  typecheck:
+    name: Type check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Astro type check
+        run: npm run astro check
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [security, typecheck]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      # Artefact réutilisé par le job de déploiement (workflow deploy.yml)
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 1

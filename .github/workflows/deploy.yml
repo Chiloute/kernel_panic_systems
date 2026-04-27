@@ -1,0 +1,49 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+# Un seul déploiement à la fois — annule le précédent si un nouveau push arrive
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+jobs:
+  # Relance le CI complet avant de déployer
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    needs: [ci]
+    environment: production   # environnement GitHub avec règles de protection optionnelles
+
+    steps:
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      # rsync : synchronise dist/ vers le serveur, supprime les fichiers obsolètes
+      - name: Deploy via rsync
+        run: |
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes" \
+            dist/ \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}/
+
+      - name: Verify deployment
+        run: |
+          ssh -i ~/.ssh/id_ed25519 \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "test -f ${{ secrets.DEPLOY_PATH }}/index.html && echo 'OK' || exit 1"

@@ -45,34 +45,40 @@ export const poleConfig: Record<
 // https://cdn.discordapp.com/avatars/{user_id}/{hash}.png?size=256
 export const bureau: BureauMember[] = [
   {
-    pseudo: "PseudoPrésident",
+    pseudo: "Jérémie",
     role: "Président",
-    avatar: "/avatars/default.svg",
-    poles: ["tech", "ctf"],
+    avatar:
+      "https://cdn.discordapp.com/avatars/353558927423569920/77fd63e1354e0db923b13cb41b439762.png?size=1024",
   },
   {
-    pseudo: "PseudoVP",
-    role: "Vice-Président",
-    avatar: "/avatars/default.svg",
-    poles: ["cyber"],
+    pseudo: "Paul",
+    role: "Conseiller",
+    avatar:
+      "https://cdn.discordapp.com/avatars/298036635847622656/9e29c5354618fa4a10d4e97629501f5b.png?size=1024",
   },
   {
-    pseudo: "PseudoTrésorier",
+    pseudo: "Pas Cam",
     role: "Trésorier",
-    avatar: "/avatars/default.svg",
-    poles: ["communication"],
+    avatar:
+      "https://cdn.discordapp.com/avatars/695281784908283914/4e604b7714106b8b5cb9a0fa97b35447.png?size=1024",
   },
   {
-    pseudo: "PseudoSecrétaire",
+    pseudo: "Louise",
     role: "Secrétaire Général",
-    avatar: "/avatars/default.svg",
-    poles: ["tech"],
+    avatar:
+      "https://cdn.discordapp.com/avatars/486891012258660358/27ef3f9e9e33405c09484dbb85816d78.png?size=1024",
   },
   {
-    pseudo: "PseudoViceSec",
-    role: "Vice-Secrétaire Générale",
-    avatar: "/avatars/default.svg",
-    poles: ["communication"],
+    pseudo: "Aymeric",
+    role: "Vice-Trésorier",
+    avatar:
+      "https://cdn.discordapp.com/avatars/652837359146237957/1d662242c1be751a20ca22873136ac48.png?size=1024",
+  },
+  {
+    pseudo: "Damien",
+    role: "Vice-Secrétaire Général",
+    avatar:
+      "https://cdn.discordapp.com/avatars/595233106340872192/9b93d53e1d7b8b11b55f7b9b43a7c33d.png?size=1024",
   },
 ];
 
